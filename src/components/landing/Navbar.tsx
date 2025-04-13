@@ -373,7 +373,7 @@ const Navbar = () => {
               transition={{
                 duration: 0.3,
               }}
-              className="fixed top-16 right-4 z-40 md:hidden rounded-xl px-5 py-4 w-64 relative"
+              className="fixed top-16 right-4 z-40 md:hidden rounded-xl px-5 py-4 w-64"
               style={{
                 willChange: willChange ? "transform, opacity" : "auto",
                 background: `
