@@ -8,7 +8,7 @@ import Navbar from "@/components/landing/Navbar";
 export default function Home() {
   return (
     <>
-      <div className="fixed inset-0 z-0 pointer-events-none -top-[100px]">
+      <div className="fixed inset-0 z-0 pointer-events-none md:-top-[100px]">
         <Image
           src={BgGradientSvg}
           alt="Background Gradient"
