@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -6,7 +7,7 @@
 
 body {
   background: #0D0B17;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Poppins', Arial, Helvetica, sans-serif;
 }
 
 .gradient-border {
@@ -20,8 +21,7 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  border-radius: 0.75rem;
-  /* rounded-xl */
+  border-radius: 12px;
   padding: 1px;
   background: linear-gradient(90deg, #48407080, #8A7AD680);
   -webkit-mask:

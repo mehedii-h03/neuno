@@ -1,11 +1,76 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, memo } from "react";
 import { ArrowUpRight, Menu, X } from "lucide-react";
 import { motion, AnimatePresence, useWillChange } from "framer-motion";
 import { DiagonalCircularButton } from "../common/Button";
 
 const navItems = ["Home", "Projects", "Services", "About", "Contact"];
+
+// Gradient border component to reduce repetition
+const GradientBorder = memo(({ className = "" }: { className?: string }) => (
+  <div
+    className={`absolute inset-0 rounded-xl border border-[#48407080] opacity-40 ${className}`}
+  />
+));
+
+GradientBorder.displayName = "GradientBorder";
+
+// NavLink component for better separation of concerns
+const NavLink = memo(
+  ({
+    item,
+    isActive,
+    onClick,
+    index,
+    scrolled,
+  }: {
+    item: string;
+    isActive: boolean;
+    onClick: () => void;
+    index: number;
+    scrolled: boolean;
+  }) => (
+    <motion.li
+      initial={{ opacity: 0, y: -8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{
+        duration: 0.3,
+        delay: 0.2 + index * 0.06,
+        type: "spring",
+        stiffness: 130,
+        damping: 20,
+        mass: 0.85,
+      }}
+      whileHover={{
+        color: "#6366f1",
+        scale: 1.01,
+      }}
+      className={`text-sm cursor-pointer relative ${
+        isActive ? "text-primary font-medium" : "text-white"
+      }`}
+      onClick={onClick}
+    >
+      {item}
+      {/* Active indicator bar that connects with the border */}
+      {isActive && !scrolled && (
+        <motion.div
+          layoutId="desktopActiveIndicator"
+          className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"
+          initial={{ width: 0, opacity: 0 }}
+          animate={{ width: "100%", opacity: 1 }}
+          style={{
+            bottom: "-12px",
+            background: "linear-gradient(90deg, #8A7AD6, #AF9EFF)", // Gradient matching theme
+          }}
+          transition={{ duration: 0.2 }}
+        />
+      )}
+    </motion.li>
+  )
+);
+
+NavLink.displayName = "NavLink";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -15,10 +80,18 @@ const Navbar = () => {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const willChange = useWillChange();
 
-  // Handle scroll effect for navbar with smoother transition
+  // Handle scroll effect with throttling for performance
   useEffect(() => {
+    let ticking = false;
+
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          setScrolled(window.scrollY > 20);
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
 
     // Set initial scroll state
@@ -30,9 +103,10 @@ const Navbar = () => {
 
   // Close menu when clicking outside or resizing
   useEffect(() => {
+    if (!isMenuOpen) return; // Skip if menu isn't open for performance
+
     const handleClickOutside = (event: MouseEvent) => {
       if (
-        isMenuOpen &&
         menuRef.current &&
         !menuRef.current.contains(event.target as Node) &&
         buttonRef.current &&
@@ -91,7 +165,7 @@ const Navbar = () => {
             opacity: 1,
             y: 0,
             scale: 1,
-            width: scrolled ? "840px" : "1200px",
+            width: scrolled ? "950px" : "1280px",
           }}
           transition={{
             opacity: { duration: 0.5 },
@@ -104,12 +178,12 @@ const Navbar = () => {
           }}
           className="relative overflow-hidden"
           style={{
-            willChange: willChange ? "transform, opacity, width" : "auto",
+            willChange,
           }}
         >
           {/* Desktop-only glass background that appears when scrolled */}
           <motion.div
-            className="hidden md:block absolute inset-0 bg-[#2E2A405C] backdrop-blur-md rounded-full"
+            className="hidden md:block absolute inset-0 bg-[#2E2A405C] backdrop-blur-md rounded-xl"
             initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
             animate={{
               opacity: scrolled ? 1 : 0,
@@ -122,8 +196,14 @@ const Navbar = () => {
             }}
           />
 
+          {/* Gradient Borders */}
+          {scrolled && <GradientBorder />}
+
           {/* Mobile-only glass background - fixed size */}
           <div className="md:hidden absolute inset-0 bg-[#2E2A405C] backdrop-blur-md rounded-xl" />
+          <div className="md:hidden">
+            <GradientBorder />
+          </div>
 
           {/* Content container */}
           <div className="relative flex items-center justify-between py-1.5 px-5 md:px-8 z-10">
@@ -158,7 +238,7 @@ const Navbar = () => {
                 duration: 0.4,
                 delay: 0.2,
               }}
-              className="hidden md:block relative rounded-full p-[1px]"
+              className="hidden md:block relative rounded-xl p-[1px]"
             >
               {/* Links background - only visible when not scrolled */}
               <motion.div
@@ -174,30 +254,21 @@ const Navbar = () => {
                 }}
               />
 
-              <ul className="relative flex items-center gap-x-8 py-3 px-10 rounded-full z-20">
-                {navItems.map((item, index) => (
-                  <motion.li
-                    initial={{ opacity: 0, y: -8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{
-                      duration: 0.3,
-                      delay: 0.2 + index * 0.06,
-                      ...springTransition,
-                    }}
-                    whileHover={{
-                      color: "#6366f1",
-                      scale: 1.01,
-                    }}
-                    className={`text-sm font-medium cursor-pointer ${
-                      activeItem === item ? "text-primary" : "text-white"
-                    }`}
-                    key={item}
-                    onClick={() => handleItemClick(item)}
-                  >
-                    {item}
-                  </motion.li>
-                ))}
-              </ul>
+              <div className="relative">
+                {!scrolled && <GradientBorder />}
+                <ul className="relative flex items-center gap-x-8 py-3 px-10 rounded-xl z-20">
+                  {navItems.map((item, index) => (
+                    <NavLink
+                      key={item}
+                      item={item}
+                      isActive={activeItem === item}
+                      onClick={() => handleItemClick(item)}
+                      index={index}
+                      scrolled={scrolled}
+                    />
+                  ))}
+                </ul>
+              </div>
             </motion.div>
 
             {/* Desktop CTA Button */}
@@ -302,8 +373,16 @@ const Navbar = () => {
               transition={{
                 duration: 0.3,
               }}
-              className="fixed top-16 right-4 z-40 md:hidden rounded-xl px-5 py-4 bg-[#2E2A405C] backdrop-blur-md border border-[#48407080] border-opacity-40 w-64"
-              style={{ willChange: willChange ? "transform, opacity" : "auto" }}
+              className="fixed top-16 right-4 z-40 md:hidden rounded-xl px-5 py-4 w-64 relative"
+              style={{
+                willChange: willChange ? "transform, opacity" : "auto",
+                background: `
+                  linear-gradient(#2E2A405C, #2E2A405C) padding-box, 
+                  linear-gradient(135deg, #48407080, #8A7AD680) border-box
+                `,
+                border: "1.5px solid transparent",
+                backdropFilter: "blur(12px)",
+              }}
             >
               <ul className="flex flex-col space-y-5 mb-6">
                 {navItems.map((item, index) => (
@@ -315,16 +394,18 @@ const Navbar = () => {
                       delay: 0.1 + index * 0.05,
                       duration: 0.3,
                     }}
-                    className={`text-lg font-medium cursor-pointer relative pl-4 ${
-                      activeItem === item ? "text-primary" : "text-white"
+                    className={`text-lg cursor-pointer relative pl-4 ${
+                      activeItem === item
+                        ? "text-primary font-medium"
+                        : "text-white"
                     }`}
                     onClick={() => handleItemClick(item)}
                   >
                     {/* Active indicator bar */}
                     {activeItem === item && (
                       <motion.div
-                        layoutId="activeIndicator"
-                        className="absolute bg-primary w-0.5 my-auto"
+                        layoutId="mobileActiveIndicator"
+                        className="absolute bg-gradient-to-r from-[#8A7AD6] to-[#AF9EFF] w-0.5 my-auto"
                         style={{
                           left: "-21px",
                           top: 0,
