@@ -10,7 +10,7 @@ const navItems = ["Home", "Projects", "Services", "About", "Contact"];
 // Gradient border component to reduce repetition
 const GradientBorder = memo(({ className = "" }: { className?: string }) => (
   <div
-    className={`absolute inset-0 rounded-xl border border-[#48407080] opacity-40 ${className}`}
+    className={`absolute inset-0 rounded-lg border border-[#48407080] opacity-40 ${className}`}
   />
 ));
 
@@ -60,8 +60,8 @@ const NavLink = memo(
           initial={{ width: 0, opacity: 0 }}
           animate={{ width: "100%", opacity: 1 }}
           style={{
-            bottom: "-12px",
-            background: "linear-gradient(90deg, #8A7AD6, #AF9EFF)", // Gradient matching theme
+            bottom: "-15px",
+            background: "linear-gradient(90deg, #06B6D4, #22D3EE)",
           }}
           transition={{ duration: 0.2 }}
         />
@@ -183,7 +183,7 @@ const Navbar = () => {
         >
           {/* Desktop-only glass background that appears when scrolled */}
           <motion.div
-            className="hidden md:block absolute inset-0 bg-[#2E2A405C] backdrop-blur-md rounded-xl"
+            className="hidden md:block absolute inset-0 bg-[#2E2A405C] backdrop-blur-md rounded-lg"
             initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
             animate={{
               opacity: scrolled ? 1 : 0,
@@ -200,7 +200,7 @@ const Navbar = () => {
           {scrolled && <GradientBorder />}
 
           {/* Mobile-only glass background - fixed size */}
-          <div className="md:hidden absolute inset-0 bg-[#2E2A405C] backdrop-blur-md rounded-xl" />
+          <div className="md:hidden absolute inset-0 bg-[#2E2A405C] backdrop-blur-md rounded-lg" />
           <div className="md:hidden">
             <GradientBorder />
           </div>
@@ -238,11 +238,11 @@ const Navbar = () => {
                 duration: 0.4,
                 delay: 0.2,
               }}
-              className="hidden md:block relative rounded-xl p-[1px]"
+              className="hidden md:block relative rounded-lg p-[1px]"
             >
               {/* Links background - only visible when not scrolled */}
               <motion.div
-                className="absolute inset-0 bg-[#2E2A405C] backdrop-blur-md rounded-xl opacity-80"
+                className="absolute inset-0 bg-[#2E2A405C] backdrop-blur-md rounded-lg opacity-80"
                 initial={{ opacity: 1 }}
                 animate={{
                   opacity: scrolled ? 0 : 1,
@@ -256,7 +256,7 @@ const Navbar = () => {
 
               <div className="relative">
                 {!scrolled && <GradientBorder />}
-                <ul className="relative flex items-center gap-x-8 py-3 px-10 rounded-xl z-20">
+                <ul className="relative flex items-center gap-x-8 py-4 px-10 rounded-lg z-20">
                   {navItems.map((item, index) => (
                     <NavLink
                       key={item}
@@ -305,7 +305,7 @@ const Navbar = () => {
                 duration: 0.4,
                 delay: 0.1,
               }}
-              className="md:hidden text-white p-2 rounded-xl z-50 flex items-center justify-center"
+              className="md:hidden text-white p-2 rounded-lg z-50 flex items-center justify-center"
               onClick={toggleMenu}
               aria-label={isMenuOpen ? "Close menu" : "Open menu"}
               whileTap={{ scale: 0.95 }}
@@ -373,7 +373,7 @@ const Navbar = () => {
               transition={{
                 duration: 0.3,
               }}
-              className="fixed top-16 right-4 z-40 md:hidden rounded-xl px-5 py-4 w-64"
+              className="fixed top-16 right-4 z-40 md:hidden rounded-lg px-5 py-4 w-64"
               style={{
                 willChange: willChange ? "transform, opacity" : "auto",
                 background: `
