@@ -41,7 +41,7 @@ const DiagonalCircularButton = ({
       {/* Inner button with background color */}
       <button
         onClick={onClick}
-        className={`relative flex items-center gap-2 rounded-lg px-6 py-3 text-sm font-medium text-white bg-primary transition-all duration-300 hover:bg-[#8A74FC] cursor-pointer m-[1px] ${className}`}
+        className={`relative flex items-center gap-2 rounded-lg px-6 py-3 text-sm font-medium text-white bg-primary transition-all duration-300 hover:bg-primary-hover cursor-pointer m-[1px] ${className}`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
