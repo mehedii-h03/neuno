@@ -31,17 +31,17 @@ const DiagonalCircularButton = ({
     <div className="relative inline-block">
       {/* Gradient border background */}
       <div
-        className="absolute inset-0 rounded-lg"
+        className="absolute inset-0"
         style={{
           background: "linear-gradient(135deg, #D5CDFF, #AF9EFF)",
-          borderRadius: "12px",
+          borderRadius: "8px",
         }}
       ></div>
 
       {/* Inner button with background color */}
       <button
         onClick={onClick}
-        className={`relative flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-medium text-white bg-primary transition-all duration-300 hover:bg-[#8A74FC] cursor-pointer m-[1px] ${className}`}
+        className={`relative flex items-center gap-2 rounded-lg px-6 py-3 text-sm font-medium text-white bg-primary transition-all duration-300 hover:bg-[#8A74FC] cursor-pointer m-[1px] ${className}`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
