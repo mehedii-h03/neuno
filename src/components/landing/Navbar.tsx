@@ -1,11 +1,10 @@
 "use client";
-
 import { useState, useEffect, useRef, useCallback, memo } from "react";
 import { ArrowUpRight, Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { DiagonalCircularButton } from "../common/Button";
 
-// Define types for component props
+// Types
 type GradientBorderProps = {
   className?: string;
 };
@@ -20,16 +19,13 @@ type NavLinkProps = {
 
 const navItems = ["Home", "Projects", "Services", "About", "Contact"];
 
-// Gradient border component with memoization
 const GradientBorder = memo(({ className = "" }: GradientBorderProps) => (
   <div
     className={`absolute inset-0 rounded-lg border border-[#48407080] opacity-40 ${className}`}
   />
 ));
-
 GradientBorder.displayName = "GradientBorder";
 
-// Optimized NavLink component with proper TypeScript types
 const NavLink = memo(
   ({ item, isActive, onClick, index, scrolled }: NavLinkProps) => (
     <motion.li
@@ -60,31 +56,34 @@ const NavLink = memo(
       )}
     </motion.li>
   ),
-  // Optimize re-renders with custom comparison
-  (prevProps, nextProps) =>
-    prevProps.isActive === nextProps.isActive &&
-    prevProps.scrolled === nextProps.scrolled
+  (prev, next) =>
+    prev.isActive === next.isActive && prev.scrolled === next.scrolled
 );
-
 NavLink.displayName = "NavLink";
 
 const Navbar = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
-  const [scrolled, setScrolled] = useState<boolean>(false);
-  const [activeItem, setActiveItem] = useState<string>("Home");
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [activeItem, setActiveItem] = useState("Home");
+  const [mounted, setMounted] = useState(false);
+
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
-  // Efficient scroll handler with throttling
+  // Avoid hydration errors
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+
     let ticking = false;
     let lastScrollY = 0;
     const scrollThreshold = 20;
 
-    const handleScroll = (): void => {
+    const handleScroll = () => {
       const currentScrollY = window.scrollY;
-
-      // Process scroll only if it changed significantly
       if (!ticking && Math.abs(currentScrollY - lastScrollY) > 5) {
         window.requestAnimationFrame(() => {
           const shouldBeScrolled = currentScrollY > scrollThreshold;
@@ -98,18 +97,16 @@ const Navbar = () => {
       }
     };
 
-    // Initial state
     setScrolled(window.scrollY > scrollThreshold);
-
     window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [scrolled]);
 
-  // Handle click outside and viewport resize
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [scrolled, mounted]);
+
   useEffect(() => {
     if (!isMenuOpen) return;
 
-    const handleClickOutside = (event: MouseEvent): void => {
+    const handleClickOutside = (event: MouseEvent) => {
       if (
         menuRef.current &&
         !menuRef.current.contains(event.target as Node) &&
@@ -120,7 +117,7 @@ const Navbar = () => {
       }
     };
 
-    const handleResize = (): void => {
+    const handleResize = () => {
       if (window.innerWidth >= 768) {
         setIsMenuOpen(false);
       }
@@ -135,35 +132,34 @@ const Navbar = () => {
     };
   }, [isMenuOpen]);
 
-  // Memoized event handlers
-  const toggleMenu = useCallback((): void => {
+  const toggleMenu = useCallback(() => {
     setIsMenuOpen((prev) => !prev);
   }, []);
 
-  const closeMenu = useCallback((): void => {
+  const closeMenu = useCallback(() => {
     setIsMenuOpen(false);
   }, []);
 
   const handleItemClick = useCallback(
-    (item: string): void => {
+    (item: string) => {
       setActiveItem(item);
       closeMenu();
     },
     [closeMenu]
   );
 
-  // Performance-optimized animation settings
   const lightTransition = {
     type: "tween" as const,
     duration: 0.2,
   };
 
+  if (!mounted) return null;
+
   return (
     <div className="fixed top-0 left-0 right-0 z-50 px-4 py-4">
       <div className="flex justify-center w-full">
-        {/* Main navbar container */}
         <motion.nav
-          initial={{ opacity: 0, y: -10 }}
+          initial={false}
           animate={{
             opacity: 1,
             y: 0,
@@ -180,31 +176,23 @@ const Navbar = () => {
             backfaceVisibility: "hidden",
           }}
         >
-          {/* Desktop background with conditional blur effect */}
           <motion.div
             className="hidden md:block absolute inset-0 bg-[#2E2A405C] backdrop-blur-md rounded-lg"
-            initial={{ opacity: 0 }}
-            animate={{
-              opacity: scrolled ? 1 : 0,
-            }}
+            initial={false}
+            animate={{ opacity: scrolled ? 1 : 0 }}
             transition={{ duration: 0.25 }}
             style={{ willChange: "opacity" }}
           />
 
-          {/* Conditional gradient border */}
           {scrolled && <GradientBorder />}
-
-          {/* Mobile background (static) */}
           <div className="md:hidden absolute inset-0 bg-[#2E2A405C] backdrop-blur-md rounded-lg" />
           <div className="md:hidden">
             <GradientBorder />
           </div>
 
-          {/* Content container */}
           <div className="relative flex items-center justify-between py-1.5 px-5 md:px-8 z-10">
-            {/* Logo */}
             <motion.h3
-              initial={{ opacity: 0 }}
+              initial={false}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.3 }}
               className="text-2xl font-bold text-white"
@@ -213,22 +201,17 @@ const Navbar = () => {
               Ne<span className="text-primary">un</span>o
             </motion.h3>
 
-            {/* Desktop navigation links */}
             <motion.div
-              initial={{ opacity: 0 }}
+              initial={false}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.3 }}
               className="hidden md:block relative rounded-lg p-[1px]"
             >
-              {/* Background for links when not scrolled */}
               <motion.div
                 className="absolute inset-0 bg-[#2E2A405C] backdrop-blur-md rounded-lg opacity-80"
-                animate={{
-                  opacity: scrolled ? 0 : 1,
-                }}
+                animate={{ opacity: scrolled ? 0 : 1 }}
                 transition={{ duration: 0.2 }}
               />
-
               <div className="relative">
                 {!scrolled && <GradientBorder />}
                 <ul className="relative flex items-center gap-x-8 py-4 px-10 rounded-lg z-20">
@@ -246,9 +229,8 @@ const Navbar = () => {
               </div>
             </motion.div>
 
-            {/* Desktop CTA button */}
             <motion.div
-              initial={{ opacity: 0 }}
+              initial={false}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.3 }}
               className="hidden md:block"
@@ -259,10 +241,9 @@ const Navbar = () => {
               </DiagonalCircularButton>
             </motion.div>
 
-            {/* Mobile menu toggle button */}
             <motion.button
               ref={buttonRef}
-              initial={{ opacity: 0 }}
+              initial={false}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.3 }}
               className="md:hidden text-white p-2 rounded-lg z-50 flex items-center justify-center"
@@ -299,11 +280,9 @@ const Navbar = () => {
         </motion.nav>
       </div>
 
-      {/* Mobile menu with backdrop */}
       <AnimatePresence>
         {isMenuOpen && (
           <>
-            {/* Backdrop overlay */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 0.9 }}
@@ -314,7 +293,6 @@ const Navbar = () => {
               style={{ transform: "translateZ(0)" }}
             />
 
-            {/* Mobile menu panel */}
             <motion.div
               ref={menuRef}
               initial={{ opacity: 0, y: -10 }}
@@ -349,7 +327,6 @@ const Navbar = () => {
                     }`}
                     onClick={() => handleItemClick(item)}
                   >
-                    {/* Active indicator for mobile */}
                     {activeItem === item && (
                       <motion.div
                         layoutId="mobileActiveIndicator"
@@ -367,7 +344,6 @@ const Navbar = () => {
                 ))}
               </ul>
 
-              {/* Mobile CTA button */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
