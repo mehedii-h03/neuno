@@ -2,13 +2,26 @@
 
 import { useState, useEffect, useRef, useCallback, memo } from "react";
 import { ArrowUpRight, Menu, X } from "lucide-react";
-import { motion, AnimatePresence, useWillChange } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { DiagonalCircularButton } from "../common/Button";
+
+// Define types for component props
+type GradientBorderProps = {
+  className?: string;
+};
+
+type NavLinkProps = {
+  item: string;
+  isActive: boolean;
+  onClick: () => void;
+  index: number;
+  scrolled: boolean;
+};
 
 const navItems = ["Home", "Projects", "Services", "About", "Contact"];
 
-// Gradient border component to reduce repetition
-const GradientBorder = memo(({ className = "" }: { className?: string }) => (
+// Gradient border component with memoization
+const GradientBorder = memo(({ className = "" }: GradientBorderProps) => (
   <div
     className={`absolute inset-0 rounded-lg border border-[#48407080] opacity-40 ${className}`}
   />
@@ -16,96 +29,87 @@ const GradientBorder = memo(({ className = "" }: { className?: string }) => (
 
 GradientBorder.displayName = "GradientBorder";
 
-// NavLink component for better separation of concerns
+// Optimized NavLink component with proper TypeScript types
 const NavLink = memo(
-  ({
-    item,
-    isActive,
-    onClick,
-    index,
-    scrolled,
-  }: {
-    item: string;
-    isActive: boolean;
-    onClick: () => void;
-    index: number;
-    scrolled: boolean;
-  }) => (
+  ({ item, isActive, onClick, index, scrolled }: NavLinkProps) => (
     <motion.li
       initial={{ opacity: 0, y: -8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{
-        duration: 0.3,
-        delay: 0.2 + index * 0.06,
-        type: "spring",
-        stiffness: 130,
-        damping: 20,
-        mass: 0.85,
+        duration: 0.2,
+        delay: 0.1 + index * 0.04,
+        type: "tween",
       }}
-      whileHover={{
-        color: "#6366f1",
-        scale: 1.01,
-      }}
+      whileTap={{ scale: 0.98 }}
       className={`text-sm cursor-pointer relative ${
         isActive ? "text-primary font-medium" : "text-white"
       }`}
       onClick={onClick}
     >
       {item}
-      {/* Active indicator bar that connects with the border */}
       {isActive && !scrolled && (
         <motion.div
           layoutId="desktopActiveIndicator"
-          className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"
-          initial={{ width: 0, opacity: 0 }}
-          animate={{ width: "100%", opacity: 1 }}
+          className="absolute bottom-0 left-0 right-0 h-0.5"
           style={{
             bottom: "-15px",
             background: "linear-gradient(90deg, #06B6D4, #22D3EE)",
           }}
-          transition={{ duration: 0.2 }}
+          transition={{ duration: 0.15 }}
         />
       )}
     </motion.li>
-  )
+  ),
+  // Optimize re-renders with custom comparison
+  (prevProps, nextProps) =>
+    prevProps.isActive === nextProps.isActive &&
+    prevProps.scrolled === nextProps.scrolled
 );
 
 NavLink.displayName = "NavLink";
 
 const Navbar = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-  const [activeItem, setActiveItem] = useState("Home");
+  const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
+  const [scrolled, setScrolled] = useState<boolean>(false);
+  const [activeItem, setActiveItem] = useState<string>("Home");
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
-  const willChange = useWillChange();
 
-  // Handle scroll effect with throttling for performance
+  // Efficient scroll handler with throttling
   useEffect(() => {
     let ticking = false;
+    let lastScrollY = 0;
+    const scrollThreshold = 20;
 
-    const handleScroll = () => {
-      if (!ticking) {
+    const handleScroll = (): void => {
+      const currentScrollY = window.scrollY;
+
+      // Process scroll only if it changed significantly
+      if (!ticking && Math.abs(currentScrollY - lastScrollY) > 5) {
         window.requestAnimationFrame(() => {
-          setScrolled(window.scrollY > 20);
+          const shouldBeScrolled = currentScrollY > scrollThreshold;
+          if (shouldBeScrolled !== scrolled) {
+            setScrolled(shouldBeScrolled);
+          }
+          lastScrollY = currentScrollY;
           ticking = false;
         });
         ticking = true;
       }
     };
 
-    // Set initial scroll state
-    handleScroll();
+    // Initial state
+    setScrolled(window.scrollY > scrollThreshold);
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [scrolled]);
 
-  // Close menu when clicking outside or resizing
+  // Handle click outside and viewport resize
   useEffect(() => {
-    if (!isMenuOpen) return; // Skip if menu isn't open for performance
+    if (!isMenuOpen) return;
 
-    const handleClickOutside = (event: MouseEvent) => {
+    const handleClickOutside = (event: MouseEvent): void => {
       if (
         menuRef.current &&
         !menuRef.current.contains(event.target as Node) &&
@@ -116,7 +120,7 @@ const Navbar = () => {
       }
     };
 
-    const handleResize = () => {
+    const handleResize = (): void => {
       if (window.innerWidth >= 768) {
         setIsMenuOpen(false);
       }
@@ -131,75 +135,66 @@ const Navbar = () => {
     };
   }, [isMenuOpen]);
 
-  const toggleMenu = useCallback(() => {
+  // Memoized event handlers
+  const toggleMenu = useCallback((): void => {
     setIsMenuOpen((prev) => !prev);
   }, []);
 
-  const closeMenu = useCallback(() => {
+  const closeMenu = useCallback((): void => {
     setIsMenuOpen(false);
   }, []);
 
   const handleItemClick = useCallback(
-    (item: string) => {
+    (item: string): void => {
       setActiveItem(item);
       closeMenu();
     },
     [closeMenu]
   );
 
-  // Enhanced spring animation settings for smoother feel
-  const springTransition = {
-    type: "spring",
-    stiffness: 130,
-    damping: 20,
-    mass: 0.85,
+  // Performance-optimized animation settings
+  const lightTransition = {
+    type: "tween" as const,
+    duration: 0.2,
   };
 
   return (
     <div className="fixed top-0 left-0 right-0 z-50 px-4 py-4">
       <div className="flex justify-center w-full">
-        {/* Desktop Navbar */}
+        {/* Main navbar container */}
         <motion.nav
-          initial={{ opacity: 0, y: -15, scale: 0.97 }}
+          initial={{ opacity: 0, y: -10 }}
           animate={{
             opacity: 1,
             y: 0,
-            scale: 1,
             width: scrolled ? "950px" : "1280px",
           }}
           transition={{
-            opacity: { duration: 0.5 },
-            y: { duration: 0.5, ...springTransition },
-            scale: { duration: 0.6, ...springTransition },
-            width: {
-              duration: 0.5,
-              ...springTransition,
-            },
+            opacity: { duration: 0.3 },
+            y: { duration: 0.3 },
+            width: { duration: 0.3 },
           }}
           className="relative overflow-hidden"
           style={{
-            willChange,
+            transform: "translateZ(0)",
+            backfaceVisibility: "hidden",
           }}
         >
-          {/* Desktop-only glass background that appears when scrolled */}
+          {/* Desktop background with conditional blur effect */}
           <motion.div
             className="hidden md:block absolute inset-0 bg-[#2E2A405C] backdrop-blur-md rounded-lg"
-            initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
+            initial={{ opacity: 0 }}
             animate={{
               opacity: scrolled ? 1 : 0,
-              backdropFilter: scrolled ? "blur(12px)" : "blur(0px)",
             }}
-            transition={{
-              opacity: { duration: 0.4 },
-              backdropFilter: { duration: 0.5 },
-              ...springTransition,
-            }}
+            transition={{ duration: 0.25 }}
+            style={{ willChange: "opacity" }}
           />
 
-          {/* Gradient Borders */}
+          {/* Conditional gradient border */}
           {scrolled && <GradientBorder />}
 
-          {/* Mobile-only glass background - fixed size */}
+          {/* Mobile background (static) */}
           <div className="md:hidden absolute inset-0 bg-[#2E2A405C] backdrop-blur-md rounded-lg" />
           <div className="md:hidden">
             <GradientBorder />
@@ -209,49 +204,29 @@ const Navbar = () => {
           <div className="relative flex items-center justify-between py-1.5 px-5 md:px-8 z-10">
             {/* Logo */}
             <motion.h3
-              initial={{ opacity: 0, x: -10 }}
-              animate={{
-                opacity: 1,
-                x: 0,
-                scale: [1, 1.03, 1],
-              }}
-              transition={{
-                opacity: { duration: 0.4, delay: 0.1 },
-                x: { duration: 0.5, delay: 0.1 },
-                scale: {
-                  times: [0, 0.5, 1],
-                  duration: 1.2,
-                  delay: 0.7,
-                  ease: "easeInOut",
-                },
-              }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
               className="text-2xl font-bold text-white"
+              style={{ transform: "translateZ(0)" }}
             >
               Ne<span className="text-primary">un</span>o
             </motion.h3>
 
-            {/* Desktop Links */}
+            {/* Desktop navigation links */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{
-                duration: 0.4,
-                delay: 0.2,
-              }}
+              transition={{ duration: 0.3 }}
               className="hidden md:block relative rounded-lg p-[1px]"
             >
-              {/* Links background - only visible when not scrolled */}
+              {/* Background for links when not scrolled */}
               <motion.div
                 className="absolute inset-0 bg-[#2E2A405C] backdrop-blur-md rounded-lg opacity-80"
-                initial={{ opacity: 1 }}
                 animate={{
                   opacity: scrolled ? 0 : 1,
-                  scale: scrolled ? 0.95 : 1,
                 }}
-                transition={{
-                  duration: 0.3,
-                  ...springTransition,
-                }}
+                transition={{ duration: 0.2 }}
               />
 
               <div className="relative">
@@ -271,67 +246,49 @@ const Navbar = () => {
               </div>
             </motion.div>
 
-            {/* Desktop CTA Button */}
+            {/* Desktop CTA button */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{
-                opacity: 1,
-                scale: 1,
-                y: [0, -3, 0],
-              }}
-              transition={{
-                opacity: { duration: 0.4, delay: 0.3 },
-                scale: { duration: 0.5, delay: 0.3, ...springTransition },
-                y: {
-                  times: [0, 0.5, 1],
-                  duration: 1.5,
-                  delay: 1,
-                  ease: "easeInOut",
-                },
-              }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
               className="hidden md:block"
+              style={{ transform: "translateZ(0)" }}
             >
               <DiagonalCircularButton icon={<ArrowUpRight size={18} />}>
                 Get started
               </DiagonalCircularButton>
             </motion.div>
 
-            {/* Mobile Menu Button */}
+            {/* Mobile menu toggle button */}
             <motion.button
               ref={buttonRef}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{
-                duration: 0.4,
-                delay: 0.1,
-              }}
+              transition={{ duration: 0.3 }}
               className="md:hidden text-white p-2 rounded-lg z-50 flex items-center justify-center"
               onClick={toggleMenu}
               aria-label={isMenuOpen ? "Close menu" : "Open menu"}
               whileTap={{ scale: 0.95 }}
+              style={{ transform: "translateZ(0)" }}
             >
               <AnimatePresence mode="wait">
                 {isMenuOpen ? (
                   <motion.div
                     key="close"
-                    initial={{ rotate: -90, opacity: 0 }}
-                    animate={{ rotate: 0, opacity: 1 }}
-                    exit={{ rotate: 90, opacity: 0 }}
-                    transition={{
-                      duration: 0.2,
-                    }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={lightTransition}
                   >
                     <X size={20} />
                   </motion.div>
                 ) : (
                   <motion.div
                     key="menu"
-                    initial={{ rotate: 90, opacity: 0 }}
-                    animate={{ rotate: 0, opacity: 1 }}
-                    exit={{ rotate: -90, opacity: 0 }}
-                    transition={{
-                      duration: 0.2,
-                    }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={lightTransition}
                   >
                     <Menu size={20} />
                   </motion.div>
@@ -342,40 +299,31 @@ const Navbar = () => {
         </motion.nav>
       </div>
 
-      {/* Mobile Menu - Positioned below hamburger */}
+      {/* Mobile menu with backdrop */}
       <AnimatePresence>
         {isMenuOpen && (
           <>
-            {/* Backdrop */}
+            {/* Backdrop overlay */}
             <motion.div
               initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              animate={{ opacity: 0.9 }}
               exit={{ opacity: 0 }}
-              transition={{
-                duration: 0.3,
-              }}
+              transition={{ duration: 0.2 }}
               className="fixed inset-0 z-40 md:hidden bg-[#0F0E13]/90 backdrop-blur-sm"
               onClick={closeMenu}
-              style={{ willChange: willChange ? "opacity" : "auto" }}
+              style={{ transform: "translateZ(0)" }}
             />
 
-            {/* Menu Container */}
+            {/* Mobile menu panel */}
             <motion.div
               ref={menuRef}
-              initial={{
-                opacity: 0,
-                y: -20,
-                scaleY: 0,
-                transformOrigin: "top right",
-              }}
-              animate={{ opacity: 1, y: 0, scaleY: 1 }}
-              exit={{ opacity: 0, y: -10, scaleY: 0 }}
-              transition={{
-                duration: 0.3,
-              }}
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -5 }}
+              transition={{ duration: 0.2 }}
               className="fixed top-16 right-4 z-40 md:hidden rounded-lg px-5 py-4 w-64"
               style={{
-                willChange: willChange ? "transform, opacity" : "auto",
+                transform: "translateZ(0)",
                 background: `
                   linear-gradient(#2E2A405C, #2E2A405C) padding-box, 
                   linear-gradient(135deg, #48407080, #8A7AD680) border-box
@@ -388,11 +336,11 @@ const Navbar = () => {
                 {navItems.map((item, index) => (
                   <motion.li
                     key={item}
-                    initial={{ opacity: 0, x: -10 }}
+                    initial={{ opacity: 0, x: -5 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{
-                      delay: 0.1 + index * 0.05,
-                      duration: 0.3,
+                      delay: 0.05 + index * 0.03,
+                      duration: 0.2,
                     }}
                     className={`text-lg cursor-pointer relative pl-4 ${
                       activeItem === item
@@ -401,7 +349,7 @@ const Navbar = () => {
                     }`}
                     onClick={() => handleItemClick(item)}
                   >
-                    {/* Active indicator bar */}
+                    {/* Active indicator for mobile */}
                     {activeItem === item && (
                       <motion.div
                         layoutId="mobileActiveIndicator"
@@ -411,9 +359,7 @@ const Navbar = () => {
                           top: 0,
                           bottom: 0,
                         }}
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "80%" }}
-                        transition={{ duration: 0.2 }}
+                        transition={{ duration: 0.15 }}
                       />
                     )}
                     {item}
@@ -421,13 +367,13 @@ const Navbar = () => {
                 ))}
               </ul>
 
-              {/* Mobile CTA Button */}
+              {/* Mobile CTA button */}
               <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
                 transition={{
-                  delay: 0.3,
-                  duration: 0.3,
+                  delay: 0.1,
+                  duration: 0.2,
                 }}
               >
                 <DiagonalCircularButton
