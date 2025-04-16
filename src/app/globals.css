@@ -1,43 +1,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
 @import "tailwindcss";
 
-
-
-/* Better */
-/* 
 @theme {
-  --color-primary: #6366F1;
-  --color-primary-hover: #818CF8;
-  --color-bg: #0B1121;
-  --color-surface: #182132;
-  --color-surface-hover: #253144;
-  --color-text: #E2E8F0;
-  --color-text-secondary: #94A3B8;
-  --color-border: #334155;
-} */
-
-/* Good */
-
-/* @theme {
-  --color-primary: #25CED1;
-  --color-primary-hover: #47E3E6;
-  --color-bg: #16161E;
-  --color-surface: #22222E;
-  --color-surface-hover: #30303E;
-  --color-text: #E4F1F2;
-  --color-text-secondary: #9CADB5;
-  --color-border: #484860;
-} */
-
-
-/* better in teal */
-@theme {
-  --color-primary: #06B6D4;
+  --color-primary: #7CFEAF;
   --color-primary-hover: #22D3EE;
-  --color-bg: #0C1021;
+  --color-bg: #060A09;
   --color-surface: #1D2035;
   --color-surface-hover: #2D3048;
-  --color-text: #DCDFE4;
+  --color-text: #EFEEFF;
   --color-text-secondary: #8B92AC;
   --color-border: #414458;
   --color-active-link: linear-gradient(90deg, #06B6D4, #22D3EE);
@@ -63,7 +33,7 @@ body {
   bottom: 0;
   border-radius: 12px;
   padding: 1px;
-  background: linear-gradient(90deg, #48407080, #8A7AD680);
+  background: linear-gradient(90deg, #01734099, #B1FDCF99);
   -webkit-mask:
     linear-gradient(#fff 0 0) content-box,
     linear-gradient(#fff 0 0);

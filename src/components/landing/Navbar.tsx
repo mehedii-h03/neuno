@@ -21,7 +21,7 @@ const navItems = ["Home", "Projects", "Services", "About", "Contact"];
 
 const GradientBorder = memo(({ className = "" }: GradientBorderProps) => (
   <div
-    className={`absolute inset-0 rounded-lg border border-[#48407080] opacity-40 ${className}`}
+    className={`absolute inset-0 rounded-lg border border-[#01734099] opacity-40 ${className}`}
   />
 ));
 GradientBorder.displayName = "GradientBorder";
@@ -38,7 +38,7 @@ const NavLink = memo(
       }}
       whileTap={{ scale: 0.98 }}
       className={`text-sm cursor-pointer relative ${
-        isActive ? "text-primary font-medium" : "text-white"
+        isActive ? "text-primary font-medium" : "text-text"
       }`}
       onClick={onClick}
     >
@@ -46,10 +46,10 @@ const NavLink = memo(
       {isActive && !scrolled && (
         <motion.div
           layoutId="desktopActiveIndicator"
-          className="absolute bottom-0 left-0 right-0 h-0.5"
+          className="absolute bottom-0 left-0 right-0 h-[2.5px]"
           style={{
-            bottom: "-15px",
-            background: "linear-gradient(90deg, #06B6D4, #22D3EE)",
+            bottom: "-17.5px",
+            background: "linear-gradient(90deg, #01734099, #B1FDCF99)",
           }}
           transition={{ duration: 0.15 }}
         />
@@ -70,7 +70,6 @@ const Navbar = () => {
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
-  // Avoid hydration errors
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -176,8 +175,10 @@ const Navbar = () => {
             backfaceVisibility: "hidden",
           }}
         >
+          {/* Scroll glass bg */}
           <motion.div
-            className="hidden md:block absolute inset-0 bg-[#2E2A405C] backdrop-blur-md rounded-lg"
+            className="hidden md:block absolute inset-0 bg-[#B1FDCF0A] backdrop-blur-md rounded-lg opacity-80
+            "
             initial={false}
             animate={{ opacity: scrolled ? 1 : 0 }}
             transition={{ duration: 0.25 }}
@@ -185,7 +186,8 @@ const Navbar = () => {
           />
 
           {scrolled && <GradientBorder />}
-          <div className="md:hidden absolute inset-0 bg-[#2E2A405C] backdrop-blur-md rounded-lg" />
+          {/* Mobile glass background */}
+          <div className="md:hidden absolute inset-0 bg-[#B1FDCF0A] backdrop-blur-md rounded-lg opacity-80" />
           <div className="md:hidden">
             <GradientBorder />
           </div>
@@ -207,8 +209,9 @@ const Navbar = () => {
               transition={{ duration: 0.3 }}
               className="hidden md:block relative rounded-lg p-[1px]"
             >
+              {/* Desktop glass background */}
               <motion.div
-                className="absolute inset-0 bg-[#2E2A405C] backdrop-blur-md rounded-lg opacity-80"
+                className="absolute inset-0 bg-[#B1FDCF0A] backdrop-blur-md rounded-lg opacity-80"
                 animate={{ opacity: scrolled ? 0 : 1 }}
                 transition={{ duration: 0.2 }}
               />
@@ -280,6 +283,7 @@ const Navbar = () => {
         </motion.nav>
       </div>
 
+      {/* Mobile Menu */}
       <AnimatePresence>
         {isMenuOpen && (
           <>
@@ -302,10 +306,7 @@ const Navbar = () => {
               className="fixed top-16 right-4 z-40 md:hidden rounded-lg px-5 py-4 w-64"
               style={{
                 transform: "translateZ(0)",
-                background: `
-                  linear-gradient(#2E2A405C, #2E2A405C) padding-box, 
-                  linear-gradient(135deg, #48407080, #8A7AD680) border-box
-                `,
+                background: `#B1FDCF0A`,
                 border: "1.5px solid transparent",
                 backdropFilter: "blur(12px)",
               }}
@@ -330,7 +331,7 @@ const Navbar = () => {
                     {activeItem === item && (
                       <motion.div
                         layoutId="mobileActiveIndicator"
-                        className="absolute bg-gradient-to-r from-[#8A7AD6] to-[#AF9EFF] w-0.5 my-auto"
+                        className="absolute bg-gradient-to-r from-[##01734099] to-[#B1FDCF99] w-0.5 my-auto"
                         style={{
                           left: "-21px",
                           top: 0,
