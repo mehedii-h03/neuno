@@ -4,6 +4,8 @@ import BgGradientSvg from "@/assets/gradients/BgGradient.svg";
 
 // Components
 import Navbar from "@/components/landing/Navbar";
+import Hero from "@/components/landing/Hero";
+import ProfileSidebar from "@/components/landing/ProfileSidebar";
 
 export default function Home() {
   return (
@@ -17,8 +19,14 @@ export default function Home() {
           className="object-cover"
         />
       </div>
+
+      {/* Profile sidebar component */}
+      <ProfileSidebar delay={3000} vibrateInterval={5000} />
+
       <Navbar />
-      <main className="relative z-10 h-[200vh]"></main>
+      <main className="relative z-10 mt-[160px] h-[200vh]">
+        <Hero />
+      </main>
     </>
   );
 }
