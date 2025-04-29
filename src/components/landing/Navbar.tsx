@@ -187,7 +187,7 @@ const Navbar = () => {
 
           {scrolled && <GradientBorder />}
           {/* Mobile glass background */}
-          <div className="md:hidden absolute inset-0 bg-[#B1FDCF0A] backdrop-blur-md rounded-lg opacity-100" />
+          <div className="md:hidden absolute inset-0 bg-[#B1FDCF0A] backdrop-blur-md rounded-lg opacity-80" />
           <div className="md:hidden">
             <GradientBorder />
           </div>
@@ -292,7 +292,7 @@ const Navbar = () => {
               animate={{ opacity: 0.9 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="fixed inset-0 z-40 md:hidden bg-[#0F0E13]/90 backdrop-blur-sm"
+              className="fixed inset-0 z-40 md:hidden bg-black/80 backdrop-blur-md rounded-xl border border-gray-700/30"
               onClick={closeMenu}
               style={{ transform: "translateZ(0)" }}
             />

@@ -34,7 +34,7 @@ const Hero = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl block mb-[-0.1em]"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-[60px] 2xl:text-7xl block mb-[-0.1em]"
           >
             Your Smart,
           </motion.span>
@@ -47,7 +47,7 @@ const Hero = () => {
               type: "spring",
               stiffness: 100,
             }}
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-semibold bg-gradient-to-r from-[#B1FDCF] to-[#0BC572] inline-block text-transparent bg-clip-text transition-colors mb-[-0.1em]"
+            className="text-4xl sm:text-5xl md:text-6xl 2xl:text-8xl lg:text-[72px] font-semibold bg-gradient-to-r from-[#B1FDCF] to-[#0BC572] inline-block text-transparent bg-clip-text transition-colors mb-[-0.1em]"
           >
             Personalized
           </motion.span>
@@ -55,7 +55,7 @@ const Hero = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.7 }}
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-semibold block"
+            className="text-4xl sm:text-5xl md:text-6xl 2xl:text-8xl lg:text-[72px] font-semibold block"
           >
             Dashboard
           </motion.span>
@@ -76,7 +76,7 @@ const Hero = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.9 }}
           >
-            <motion.p className="max-w-[60ch] mx-auto text-center text-base md:text-lg pt-[18px]">
+            <motion.p className="mx-auto text-center pt-[18px] text-sm md:text-2xl">
               <motion.span
                 initial={{ color: "#B1FDCF" }}
                 animate={{ color: "#01C671" }}
@@ -86,14 +86,14 @@ const Hero = () => {
                   repeat: Infinity,
                   repeatType: "reverse",
                 }}
-                className="font-semibold transition-colors "
+                className="font-semibold transition-colors"
               >
                 Neuno
               </motion.span>{" "}
-              <span className="text-text-secondary font-extralight tracking-tighter transition-colors">
+              <span className="font-extralight text-[#B3C8BB] tracking-tighter transition-colors">
                 brings everything you need — weather, tasks, news, calendar, and
-                more into a refined, AI-enhanced space that intuitively adapts
-                to your life.
+                more <br /> into a refined, AI-enhanced space that intuitively
+                adapts to your life.
               </span>
             </motion.p>
           </motion.div>
