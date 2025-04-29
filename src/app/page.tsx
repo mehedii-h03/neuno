@@ -24,7 +24,7 @@ export default function Home() {
       <ProfileSidebar delay={3000} vibrateInterval={5000} />
 
       <Navbar />
-      <main className="relative z-10 mt-[160px] h-[200vh]">
+      <main className="relative z-10 mt-[100px] lg:mt-[160px] h-[200vh]">
         <Hero />
       </main>
     </>

@@ -187,7 +187,7 @@ const Navbar = () => {
 
           {scrolled && <GradientBorder />}
           {/* Mobile glass background */}
-          <div className="md:hidden absolute inset-0 bg-[#B1FDCF0A] backdrop-blur-md rounded-lg opacity-80" />
+          <div className="md:hidden absolute inset-0 bg-[#B1FDCF0A] backdrop-blur-md rounded-lg opacity-100" />
           <div className="md:hidden">
             <GradientBorder />
           </div>
